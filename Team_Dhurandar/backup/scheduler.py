@@ -14,7 +14,7 @@ Usage:
         watch_root      = "test_folder",
         index_path      = ".backup/state.json",
         backup_dir      = "backup_folder",
-        metadata_server = "http://localhost:8000",
+        metadata_server = "https://team-dhurandar-api.onrender.com",
         interval_mins   = 5,
     )
     scheduler.start()   # runs forever in background

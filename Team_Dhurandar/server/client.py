@@ -10,7 +10,7 @@ machine on the network — just change the server_url.
 Usage:
     from server.client import MetadataClient
 
-    client = MetadataClient(server_url="http://localhost:8000")
+    client = MetadataClient(server_url="https://team-dhurandar-api.onrender.com")
 
     # Send metadata after a backup run
     client.send_run(
@@ -41,14 +41,14 @@ class MetadataClient:
 
     Args:
         server_url: Full URL of the metadata server.
-                    Same machine : "http://localhost:8000"
+                    Same machine : "https://team-dhurandar-api.onrender.com"
                     Network      : "http://192.168.1.x:8000"
         timeout:    Request timeout in seconds.
     """
 
     def __init__(
         self,
-        server_url: str = "http://localhost:8000",
+        server_url: str = "https://team-dhurandar-api.onrender.com",
         timeout:    int = 10,
     ):
         if not _HTTPX_AVAILABLE:

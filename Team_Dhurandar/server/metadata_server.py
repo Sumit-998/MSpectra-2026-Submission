@@ -243,7 +243,7 @@ def scheduler_start(payload: SchedulerStartPayload):
             watch_root    = payload.watch_root,
             index_path    = payload.index_path,
             backup_dir    = payload.backup_dir,
-            metadata_server = "http://localhost:8000",
+            metadata_server = "https://team-dhurandar-api.onrender.com",
             interval_mins = payload.interval_mins,
             use_watcher   = True,
         )

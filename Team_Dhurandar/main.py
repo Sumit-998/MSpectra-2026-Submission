@@ -245,12 +245,12 @@ def main():
 
     # ── server status ──
     p_ss = sub.add_parser("server:status", help="Check metadata server status")
-    p_ss.add_argument("--url", default="http://localhost:8000")
+    p_ss.add_argument("--url", default="https://team-dhurandar-api.onrender.com")
     p_ss.set_defaults(func=cmd_server_status)
 
     # ── server files ──
     p_sf = sub.add_parser("server:files", help="List files tracked by metadata server")
-    p_sf.add_argument("--url",   default="http://localhost:8000")
+    p_sf.add_argument("--url",   default="https://team-dhurandar-api.onrender.com")
     p_sf.add_argument("--limit", type=int, default=50)
     p_sf.set_defaults(func=cmd_server_files)
 

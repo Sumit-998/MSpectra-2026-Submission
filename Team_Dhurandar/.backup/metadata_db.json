@@ -9,7 +9,7 @@
       "change_type": "unchanged",
       "compressed": false,
       "chunk_count": 1,
-      "run_id": "startup_sync_1775275438"
+      "run_id": "startup_sync_1775290210"
     },
     "test_change_detector.py": {
       "path": "test_change_detector.py",
@@ -20,7 +20,7 @@
       "change_type": "unchanged",
       "compressed": false,
       "chunk_count": 1,
-      "run_id": "startup_sync_1775275438"
+      "run_id": "startup_sync_1775290210"
     },
     "THIS IS CHIRAG.txt": {
       "path": "THIS IS CHIRAG.txt",
@@ -31,7 +31,7 @@
       "change_type": "unchanged",
       "compressed": false,
       "chunk_count": 1,
-      "run_id": "startup_sync_1775275438"
+      "run_id": "startup_sync_1775290210"
     },
     "aditya.txt": {
       "path": "aditya.txt",
@@ -42,7 +42,7 @@
       "change_type": "unchanged",
       "compressed": false,
       "chunk_count": 1,
-      "run_id": "startup_sync_1775275438"
+      "run_id": "startup_sync_1775290210"
     }
   },
   "runs": [
@@ -214,6 +214,90 @@
       "run_id": "startup_sync_1775275438",
       "watch_root": "/home/sumit-bushan-singh/Desktop/Team_Dhurandar/tests",
       "timestamp": 1775275438.9291403,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289293",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289293.828741,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289293",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289293.8507822,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289555",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289555.3106215,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289555",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289555.336657,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289833",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289834.0058243,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289834",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289834.0260465,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289844",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289844.7268848,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289844",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289844.756437,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289964",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289964.3418314,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775289964",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775289964.3626492,
+      "file_count": 4,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775290210",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775290210.7496274,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775290210",
+      "watch_root": "/home/sumit-bushan-singh/MSpectra-2026-Submission/Team_Dhurandar/tests",
+      "timestamp": 1775290210.7799313,
       "file_count": 4,
       "summary": {}
     }

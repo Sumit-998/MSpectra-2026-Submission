@@ -24,7 +24,7 @@ SERVER_PID=$!
 sleep 3
 
 # Check server is up
-if curl -s http://localhost:8000/health > /dev/null; then
+if curl -s https://team-dhurandar-api.onrender.com/health > /dev/null; then
     echo "  [1/3] Metadata server running ✓"
 else
     echo "  [1/3] Server failed to start — check your setup"
@@ -38,7 +38,7 @@ python3 main.py schedule \
     --root tests \
     --index .backup/state.json \
     --dest backup_folder \
-    --metadata-server http://localhost:8000 &
+    --metadata-server https://team-dhurandar-api.onrender.com &
 SCHEDULER_PID=$!
 sleep 2
 echo "  [2/3] Scheduler running ✓"
@@ -46,13 +46,13 @@ echo "  [2/3] Scheduler running ✓"
 # Open browser
 echo "  [3/3] Opening dashboard in browser..."
 sleep 1
-xdg-open http://localhost:8000 2>/dev/null || \
-    python3 -m webbrowser http://localhost:8000
+xdg-open https://team-dhurandar-api.onrender.com 2>/dev/null || \
+    python3 -m webbrowser https://team-dhurandar-api.onrender.com
 
 echo ""
 echo "============================================"
 echo "   Everything is running!"
-echo "   Dashboard → http://localhost:8000"
+echo "   Dashboard → https://team-dhurandar-api.onrender.com"
 echo "   Press Ctrl+C to stop everything"
 echo "============================================"
 echo ""
