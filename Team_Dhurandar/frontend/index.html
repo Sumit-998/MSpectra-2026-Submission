@@ -285,6 +285,7 @@ function Sidebar({ page, setPage, online }) {
     { id:"files",     icon:"◫", label:"FILES" },
     { id:"runs",      icon:"◷", label:"RUN HISTORY" },
     { id:"scheduler", icon:"◉", label:"SCHEDULER" },
+    { id:"ai",        icon:"◆", label:"AI PRIORITY" },
   ];
   return (
     <div className="sidebar">
@@ -642,6 +643,140 @@ function Scheduler({ toast }) {
   );
 }
 
+// ── AI Priority ───────────────────────────────────────────────────────────────
+
+function AIPriority({ toast }) {
+  const [apiKey,   setApiKey]   = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [results,  setResults]  = useState(null);
+
+  async function runPrioritize() {
+    if (!apiKey.trim()) { toast("Please enter your Groq API key", "error"); return; }
+    setLoading(true);
+    setResults(null);
+    try {
+      const r = await fetch(`${API}/ai/prioritize`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ api_key: apiKey }),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      const d = await r.json();
+      setResults(d.files);
+      toast(`Groq ranked ${d.total} files!`, "success");
+    } catch(e) {
+      toast(`Error: ${e.message}`, "error");
+    }
+    setLoading(false);
+  }
+
+  const priorityColor = {
+    high:   "var(--accent)",
+    medium: "var(--warn)",
+    low:    "var(--muted)",
+  };
+
+  const priorityBadge = {
+    high:   "badge-new",
+    medium: "badge-modified",
+    low:    "badge-unchanged",
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-title">AI Priority</div>
+        <div className="page-sub">GROQ-POWERED FILE PRIORITIZATION</div>
+      </div>
+
+      <div className="card" style={{marginBottom:16}}>
+        <div className="section-title" style={{marginBottom:12}}>Enter Groq API Key</div>
+        <div style={{display:"flex", gap:12, alignItems:"flex-end"}}>
+          <div className="input-group" style={{flex:1}}>
+            <div className="input-label">Groq API Key</div>
+            <input
+              type="password"
+              placeholder="gsk_..."
+              value={apiKey}
+              onChange={e => setApiKey(e.target.value)}
+            />
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={runPrioritize}
+            disabled={loading}
+            style={{whiteSpace:"nowrap"}}
+          >
+            {loading ? "◌ Ranking..." : "◆ Run AI Priority"}
+          </button>
+        </div>
+        <div style={{fontSize:11, color:"var(--muted)", marginTop:8}}>
+          Get your free API key at console.groq.com — uses llama3-8b-8192
+        </div>
+      </div>
+
+      {loading && (
+        <div className="loading">
+          <div className="spinner"/>
+          Groq is analyzing your files...
+        </div>
+      )}
+
+      {results && results.length > 0 && (
+        <div className="card">
+          <div className="section-header">
+            <div className="section-title">{results.length} files ranked by AI</div>
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>File</th>
+                  <th>AI Priority</th>
+                  <th>Score</th>
+                  <th>Reason</th>
+                  <th>Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((f, i) => (
+                  <tr key={f.path}>
+                    <td style={{color:"var(--muted)", fontSize:11}}>{i+1}</td>
+                    <td style={{fontFamily:"var(--mono)", fontSize:12}}>{f.path}</td>
+                    <td>
+                      <span className={`badge badge-${f.ai_priority === "high" ? "new" : f.ai_priority === "medium" ? "modified" : "unchanged"}`}>
+                        {f.ai_priority}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{display:"flex", alignItems:"center", gap:8}}>
+                        <div style={{width:60, height:4, background:"var(--border)", borderRadius:2}}>
+                          <div style={{width:`${f.ai_score}%`, height:"100%", background: priorityColor[f.ai_priority] || "var(--muted)", borderRadius:2}}/>
+                        </div>
+                        <span style={{fontSize:11, color:"var(--muted)"}}>{f.ai_score}</span>
+                      </div>
+                    </td>
+                    <td style={{fontSize:11, color:"var(--muted)", maxWidth:250}}>{f.ai_reason}</td>
+                    <td className="file-size">{fmtBytes(f.size)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {results && results.length === 0 && (
+        <div className="empty">
+          <div className="empty-icon">◆</div>
+          No files to prioritize — run a backup first
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 
 function App() {
@@ -665,7 +800,7 @@ function App() {
     setToastMsg({ msg, type });
   }
 
-  const pages = { dashboard: <Dashboard toast={toast}/>, files: <Files toast={toast}/>, runs: <Runs/>, scheduler: <Scheduler toast={toast}/> };
+  const pages = { dashboard: <Dashboard toast={toast}/>, files: <Files toast={toast}/>, runs: <Runs/>, scheduler: <Scheduler toast={toast}/>, ai: <AIPriority toast={toast}/> };
 
   return (
     <div className="app">
@@ -686,4 +821,6 @@ function App() {
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
+
+
 </html>
