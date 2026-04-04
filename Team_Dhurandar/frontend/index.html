@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Backup System</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  :root {
+    --bg:       #0a0a0f;
+    --surface:  #111118;
+    --border:   #1e1e2e;
+    --accent:   #00ff9d;
+    --accent2:  #7b61ff;
+    --danger:   #ff4d6d;
+    --warn:     #ffba08;
+    --text:     #e8e8f0;
+    --muted:    #6b6b80;
+    --mono:     'JetBrains Mono', monospace;
+    --sans:     'Syne', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--mono); min-height:100vh; overflow-x:hidden; }
+
+  /* Scanline overlay */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+    background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  }
+
+  /* Grid background */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  #root { position:relative; z-index:1; }
+
+  /* Layout */
+  .app { display:flex; min-height:100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width:220px; flex-shrink:0; background:var(--surface);
+    border-right:1px solid var(--border); padding:24px 0;
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+  }
+  .logo {
+    padding:0 20px 28px; border-bottom:1px solid var(--border);
+    font-family:var(--sans); font-size:18px; font-weight:800; letter-spacing:-0.5px;
+  }
+  .logo span { color:var(--accent); }
+  .logo sub { font-size:10px; color:var(--muted); display:block; font-family:var(--mono); font-weight:300; margin-top:2px; }
+  .nav { padding:16px 0; flex:1; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:10px 20px;
+    cursor:pointer; font-size:12px; color:var(--muted); transition:all 0.15s;
+    border-left:2px solid transparent; letter-spacing:0.5px;
+  }
+  .nav-item:hover { color:var(--text); background:rgba(255,255,255,0.03); }
+  .nav-item.active { color:var(--accent); border-left-color:var(--accent); background:rgba(0,255,157,0.05); }
+  .nav-icon { font-size:14px; width:16px; text-align:center; }
+  .status-dot {
+    width:6px; height:6px; border-radius:50%; margin-left:auto;
+    background:var(--muted);
+  }
+  .status-dot.online { background:var(--accent); box-shadow:0 0 6px var(--accent); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Main content */
+  .main { flex:1; padding:32px; overflow-y:auto; }
+  .page-header { margin-bottom:28px; }
+  .page-title { font-family:var(--sans); font-size:24px; font-weight:800; letter-spacing:-0.5px; }
+  .page-sub { color:var(--muted); font-size:11px; margin-top:4px; letter-spacing:0.5px; }
+
+  /* Cards */
+  .card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:20px;
+  }
+  .card-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+  .card-value { font-size:28px; font-weight:700; font-family:var(--sans); }
+  .card-value.accent { color:var(--accent); }
+  .card-value.accent2 { color:var(--accent2); }
+  .card-value.warn { color:var(--warn); }
+  .card-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  /* Grids */
+  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+
+  /* Section header */
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .section-title { font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+  /* Table */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { text-align:left; padding:8px 12px; color:var(--muted); font-size:10px; letter-spacing:0.8px; text-transform:uppercase; border-bottom:1px solid var(--border); font-weight:400; }
+  td { padding:10px 12px; border-bottom:1px solid rgba(30,30,46,0.5); vertical-align:middle; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+  tr:last-child td { border-bottom:none; }
+
+  /* Badges */
+  .badge {
+    display:inline-block; padding:2px 8px; border-radius:3px;
+    font-size:10px; letter-spacing:0.5px; text-transform:uppercase; font-weight:500;
+  }
+  .badge-new { background:rgba(0,255,157,0.1); color:var(--accent); border:1px solid rgba(0,255,157,0.2); }
+  .badge-modified { background:rgba(255,186,8,0.1); color:var(--warn); border:1px solid rgba(255,186,8,0.2); }
+  .badge-unchanged { background:rgba(107,107,128,0.1); color:var(--muted); border:1px solid rgba(107,107,128,0.2); }
+  .badge-success { background:rgba(0,255,157,0.1); color:var(--accent); border:1px solid rgba(0,255,157,0.2); }
+  .badge-error { background:rgba(255,77,109,0.1); color:var(--danger); border:1px solid rgba(255,77,109,0.2); }
+
+  /* Buttons */
+  .btn {
+    padding:8px 16px; border-radius:5px; font-size:12px; cursor:pointer;
+    border:none; font-family:var(--mono); letter-spacing:0.5px; transition:all 0.15s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-primary { background:var(--accent); color:#000; font-weight:600; }
+  .btn-primary:hover { background:#00e68a; }
+  .btn-danger { background:rgba(255,77,109,0.15); color:var(--danger); border:1px solid rgba(255,77,109,0.3); }
+  .btn-danger:hover { background:rgba(255,77,109,0.25); }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-ghost:hover { color:var(--text); border-color:var(--muted); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+  /* Scheduler panel */
+  .scheduler-status {
+    display:flex; align-items:center; gap:12px; padding:16px 20px;
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    margin-bottom:16px;
+  }
+  .scheduler-indicator {
+    width:10px; height:10px; border-radius:50%; flex-shrink:0;
+  }
+  .scheduler-indicator.running { background:var(--accent); box-shadow:0 0 10px var(--accent); animation:pulse 2s infinite; }
+  .scheduler-indicator.stopped { background:var(--muted); }
+  .scheduler-info { flex:1; }
+  .scheduler-label { font-size:13px; font-weight:500; }
+  .scheduler-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+
+  /* Input */
+  .input-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+  .input-group { display:flex; flex-direction:column; gap:4px; flex:1; }
+  .input-label { font-size:10px; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; }
+  input[type=text], input[type=number] {
+    background:var(--bg); border:1px solid var(--border); border-radius:5px;
+    padding:8px 12px; color:var(--text); font-family:var(--mono); font-size:12px;
+    outline:none; transition:border-color 0.15s;
+  }
+  input:focus { border-color:var(--accent); }
+
+  /* Run timeline */
+  .run-item {
+    display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border);
+    align-items:flex-start;
+  }
+  .run-item:last-child { border-bottom:none; }
+  .run-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:4px; flex-shrink:0; }
+  .run-time { font-size:10px; color:var(--muted); margin-top:2px; }
+  .run-stats { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
+  .run-stat { font-size:10px; color:var(--muted); }
+  .run-stat span { color:var(--text); }
+
+  /* File size */
+  .file-size { color:var(--muted); font-size:11px; }
+  .file-hash { color:var(--muted); font-size:10px; font-family:var(--mono); }
+
+  /* Empty state */
+  .empty { text-align:center; padding:48px; color:var(--muted); font-size:12px; }
+  .empty-icon { font-size:32px; margin-bottom:12px; opacity:0.3; }
+
+  /* Loading */
+  .loading { display:flex; align-items:center; justify-content:center; padding:48px; color:var(--muted); gap:8px; font-size:12px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.6s linear infinite; }
+
+  /* Refresh button */
+  .refresh-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:12px; font-family:var(--mono); display:flex; align-items:center; gap:4px; }
+  .refresh-btn:hover { color:var(--accent); }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:24px; right:24px; z-index:9999;
+    background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:12px 16px; font-size:12px; display:flex; align-items:center; gap:8px;
+    animation:slideIn 0.2s ease;
+  }
+  .toast.success { border-color:rgba(0,255,157,0.3); }
+  .toast.error { border-color:rgba(255,77,109,0.3); color:var(--danger); }
+  @keyframes slideIn { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  /* Progress bar */
+  .progress-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:6px; }
+  .progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.3s; }
+
+  /* Restore button */
+  .restore-btn {
+    background:rgba(123,97,255,0.1); color:var(--accent2); border:1px solid rgba(123,97,255,0.2);
+    padding:3px 10px; border-radius:3px; font-size:10px; cursor:pointer; font-family:var(--mono);
+    transition:all 0.15s;
+  }
+  .restore-btn:hover { background:rgba(123,97,255,0.2); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+const API = "http://localhost:8000";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function fmtBytes(n) {
+  if (!n) return "0 B";
+  const u = ["B","KB","MB","GB"];
+  let i = 0;
+  while (n >= 1024 && i < u.length-1) { n /= 1024; i++; }
+  return `${n.toFixed(1)} ${u[i]}`;
+}
+
+function fmtTime(ts) {
+  if (!ts) return "—";
+  return new Date(ts * 1000).toLocaleString("en-US", {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+
+function fmtAgo(ts) {
+  if (!ts) return "never";
+  const s = Math.floor((Date.now()/1000) - ts);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+
+// ── API hooks ─────────────────────────────────────────────────────────────────
+
+function useAPI(endpoint, interval=0) {
+  const [data, setData]     = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState(null);
+
+  const fetch_ = useCallback(async () => {
+    try {
+      const r = await fetch(`${API}${endpoint}`);
+      if (!r.ok) throw new Error(r.statusText);
+      setData(await r.json());
+      setError(null);
+    } catch(e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint]);
+
+  useEffect(() => {
+    fetch_();
+    if (interval > 0) {
+      const id = setInterval(fetch_, interval);
+      return () => clearInterval(id);
+    }
+  }, [fetch_, interval]);
+
+  return { data, loading, error, refetch: fetch_ };
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+function Toast({ msg, type, onClose }) {
+  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
+  return <div className={`toast ${type}`}>{type === "success" ? "✓" : "✗"} {msg}</div>;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+
+function Sidebar({ page, setPage, online }) {
+  const items = [
+    { id:"dashboard", icon:"◈", label:"DASHBOARD" },
+    { id:"files",     icon:"◫", label:"FILES" },
+    { id:"runs",      icon:"◷", label:"RUN HISTORY" },
+    { id:"scheduler", icon:"◉", label:"SCHEDULER" },
+  ];
+  return (
+    <div className="sidebar">
+      <div className="logo">
+        AI<span>BACKUP</span>
+        <sub>v1.0 · metadata server</sub>
+      </div>
+      <nav className="nav">
+        {items.map(item => (
+          <div key={item.id} className={`nav-item ${page===item.id?"active":""}`} onClick={() => setPage(item.id)}>
+            <span className="nav-icon">{item.icon}</span>
+            {item.label}
+            {item.id === "dashboard" && <span className={`status-dot ${online?"online":""}`}/>}
+          </div>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+function Dashboard({ toast }) {
+  const { data: stats, loading, refetch } = useAPI("/stats", 5000);
+  const { data: runs } = useAPI("/runs?limit=5", 5000);
+
+  if (loading) return <div className="loading"><div className="spinner"/> loading stats...</div>;
+
+  const lastRun = runs?.runs?.[0];
+  const s = stats || {};
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-title">Dashboard</div>
+        <div className="page-sub">LIVE BACKUP OVERVIEW · AUTO-REFRESH 5S</div>
+      </div>
+
+      <div className="grid-4">
+        <div className="card">
+          <div className="card-label">Files Tracked</div>
+          <div className="card-value accent">{s.total_files ?? 0}</div>
+          <div className="card-sub">{s.change_breakdown?.new ?? 0} new · {s.change_breakdown?.modified ?? 0} modified</div>
+        </div>
+        <div className="card">
+          <div className="card-label">Total Backup Runs</div>
+          <div className="card-value accent2">{s.total_runs ?? 0}</div>
+          <div className="card-sub">last {fmtAgo(s.last_backup)}</div>
+        </div>
+        <div className="card">
+          <div className="card-label">Data Stored</div>
+          <div className="card-value warn">{fmtBytes((s.total_size_mb ?? 0) * 1024 * 1024)}</div>
+          <div className="card-sub">across all backed-up files</div>
+        </div>
+        <div className="card">
+          <div className="card-label">Last Backup</div>
+          <div className="card-value" style={{fontSize:16,paddingTop:6}}>{fmtTime(s.last_backup)}</div>
+          <div className="card-sub">{fmtAgo(s.last_backup)}</div>
+        </div>
+      </div>
+
+      <div className="grid-2">
+        <div className="card">
+          <div className="section-header">
+            <div className="section-title">Recent Runs</div>
+            <button className="refresh-btn" onClick={refetch}>↻ refresh</button>
+          </div>
+          {runs?.runs?.length > 0 ? runs.runs.map(r => (
+            <div key={r.run_id} className="run-item">
+              <div className="run-dot"/>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12}}>{r.watch_root}</div>
+                <div className="run-time">{fmtTime(r.timestamp)} · {r.file_count} files</div>
+                <div className="run-stats">
+                  {r.summary?.files_new > 0 && <div className="run-stat">new <span>{r.summary.files_new}</span></div>}
+                  {r.summary?.files_modified > 0 && <div className="run-stat">modified <span>{r.summary.files_modified}</span></div>}
+                  {r.summary?.bytes_to_backup > 0 && <div className="run-stat">size <span>{fmtBytes(r.summary.bytes_to_backup)}</span></div>}
+                </div>
+              </div>
+            </div>
+          )) : <div className="empty"><div className="empty-icon">◷</div>No runs yet</div>}
+        </div>
+
+        <div className="card">
+          <div className="section-header">
+            <div className="section-title">File Breakdown</div>
+          </div>
+          <div style={{display:"flex", flexDirection:"column", gap:14, marginTop:8}}>
+            {[
+              { label:"New files", value: s.change_breakdown?.new ?? 0, color:"var(--accent)", total: s.total_files || 1 },
+              { label:"Modified files", value: s.change_breakdown?.modified ?? 0, color:"var(--warn)", total: s.total_files || 1 },
+              { label:"Unchanged", value: (s.total_files ?? 0) - (s.change_breakdown?.new ?? 0) - (s.change_breakdown?.modified ?? 0), color:"var(--muted)", total: s.total_files || 1 },
+            ].map(item => (
+              <div key={item.label}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:4}}>
+                  <span style={{color:"var(--muted)"}}>{item.label}</span>
+                  <span>{item.value}</span>
+                </div>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width:`${Math.min(100,(item.value/item.total)*100)}%`,background:item.color}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Files ─────────────────────────────────────────────────────────────────────
+
+function Files({ toast }) {
+  const { data, loading, refetch } = useAPI("/files?limit=100", 10000);
+  const [search, setSearch] = useState("");
+
+  const files = (data?.files ?? []).filter(f =>
+    f.path.toLowerCase().includes(search.toLowerCase())
+  );
+
+  function handleRestore(path) {
+    toast(`Restore triggered for ${path} — run: python3 main.py restore:file --file "${path}"`, "success");
+  }
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-title">Files</div>
+        <div className="page-sub">{data?.total ?? 0} FILES TRACKED BY METADATA SERVER</div>
+      </div>
+
+      <div className="card" style={{marginBottom:16}}>
+        <div style={{display:"flex", gap:12, alignItems:"center"}}>
+          <input
+            type="text" placeholder="Search files..." value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{flex:1}}
+          />
+          <button className="refresh-btn" onClick={refetch}>↻ refresh</button>
+        </div>
+      </div>
+
+      <div className="card">
+        {loading ? (
+          <div className="loading"><div className="spinner"/> loading files...</div>
+        ) : files.length === 0 ? (
+          <div className="empty">
+            <div className="empty-icon">◫</div>
+            {search ? "No files match your search" : "No files backed up yet"}
+          </div>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Size</th>
+                  <th>Status</th>
+                  <th>Hash</th>
+                  <th>Backed Up</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {files.map(f => (
+                  <tr key={f.path}>
+                    <td style={{fontFamily:"var(--mono)", fontSize:12}}>{f.path}</td>
+                    <td className="file-size">{fmtBytes(f.size)}</td>
+                    <td>
+                      <span className={`badge badge-${f.change_type === "new" ? "new" : f.change_type === "modified" ? "modified" : "unchanged"}`}>
+                        {f.change_type}
+                      </span>
+                    </td>
+                    <td className="file-hash">{f.sha256?.slice(0,12)}…</td>
+                    <td style={{fontSize:11, color:"var(--muted)"}}>{fmtTime(f.backed_up_at)}</td>
+                    <td>
+                      <button className="restore-btn" onClick={() => handleRestore(f.path)}>
+                        ↩ restore
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Run History ───────────────────────────────────────────────────────────────
+
+function Runs() {
+  const { data, loading, refetch } = useAPI("/runs?limit=50", 10000);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-title">Run History</div>
+        <div className="page-sub">ALL BACKUP RUNS · NEWEST FIRST</div>
+      </div>
+      <div className="card">
+        <div className="section-header">
+          <div className="section-title">{data?.total ?? 0} total runs</div>
+          <button className="refresh-btn" onClick={refetch}>↻ refresh</button>
+        </div>
+        {loading ? (
+          <div className="loading"><div className="spinner"/> loading...</div>
+        ) : (data?.runs ?? []).length === 0 ? (
+          <div className="empty"><div className="empty-icon">◷</div>No backup runs yet</div>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Run ID</th>
+                  <th>Watch Root</th>
+                  <th>Files</th>
+                  <th>New</th>
+                  <th>Modified</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data?.runs ?? []).map(r => (
+                  <tr key={r.run_id}>
+                    <td className="file-hash">{r.run_id?.slice(0,24)}</td>
+                    <td style={{fontSize:11}}>{r.watch_root}</td>
+                    <td>{r.file_count}</td>
+                    <td><span className="badge badge-new">{r.summary?.files_new ?? 0}</span></td>
+                    <td><span className="badge badge-modified">{r.summary?.files_modified ?? 0}</span></td>
+                    <td style={{fontSize:11, color:"var(--muted)"}}>{fmtTime(r.timestamp)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Scheduler ─────────────────────────────────────────────────────────────────
+
+function Scheduler({ toast }) {
+  const { data: status, refetch } = useAPI("/scheduler/status", 3000);
+  const [watchRoot,    setWatchRoot]    = useState("tests");
+  const [indexPath,    setIndexPath]    = useState(".backup/state.json");
+  const [backupDir,    setBackupDir]    = useState("backup_folder");
+  const [interval,     setInterval_]   = useState(5);
+  const [loading,      setLoading]      = useState(false);
+
+  async function start() {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API}/scheduler/start`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ watch_root:watchRoot, index_path:indexPath, backup_dir:backupDir, interval_mins:parseInt(interval) }),
+      });
+      const d = await r.json();
+      toast(d.status === "started" ? "Scheduler started!" : d.message, d.status === "started" ? "success" : "error");
+      refetch();
+    } catch(e) { toast("Failed to start scheduler", "error"); }
+    setLoading(false);
+  }
+
+  async function stop() {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API}/scheduler/stop`, { method:"POST" });
+      const d = await r.json();
+      toast(d.status === "stopped" ? "Scheduler stopped." : d.message, "success");
+      refetch();
+    } catch(e) { toast("Failed to stop scheduler", "error"); }
+    setLoading(false);
+  }
+
+  const running = status?.running;
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="page-title">Scheduler</div>
+        <div className="page-sub">AUTO-BACKUP CONFIGURATION & CONTROLS</div>
+      </div>
+
+      <div className="scheduler-status">
+        <div className={`scheduler-indicator ${running ? "running" : "stopped"}`}/>
+        <div className="scheduler-info">
+          <div className="scheduler-label">{running ? "Scheduler Running" : "Scheduler Stopped"}</div>
+          <div className="scheduler-meta">
+            {running
+              ? `Watching: ${status?.watching} · Every ${status?.interval_mins} min · ${status?.runs_total ?? 0} runs`
+              : "Start the scheduler to enable automatic backups"}
+          </div>
+        </div>
+        {running
+          ? <button className="btn btn-danger" onClick={stop} disabled={loading}>⏹ Stop</button>
+          : null
+        }
+      </div>
+
+      {running && (
+        <div className="grid-4" style={{marginBottom:24}}>
+          <div className="card">
+            <div className="card-label">Total Runs</div>
+            <div className="card-value accent">{status?.runs_total ?? 0}</div>
+          </div>
+          <div className="card">
+            <div className="card-label">Successful</div>
+            <div className="card-value accent">{status?.runs_successful ?? 0}</div>
+          </div>
+          <div className="card">
+            <div className="card-label">Last Run</div>
+            <div className="card-value" style={{fontSize:13,paddingTop:4}}>{status?.last_run_at ?? "—"}</div>
+          </div>
+          <div className="card">
+            <div className="card-label">Interval</div>
+            <div className="card-value accent2">{status?.interval_mins ?? 0}<span style={{fontSize:14}}>m</span></div>
+          </div>
+        </div>
+      )}
+
+      {!running && (
+        <div className="card">
+          <div className="section-title" style={{marginBottom:16}}>Configure & Start</div>
+          <div className="input-row">
+            <div className="input-group">
+              <div className="input-label">Watch Root</div>
+              <input type="text" value={watchRoot} onChange={e => setWatchRoot(e.target.value)} placeholder="tests"/>
+            </div>
+            <div className="input-group">
+              <div className="input-label">Index Path</div>
+              <input type="text" value={indexPath} onChange={e => setIndexPath(e.target.value)} placeholder=".backup/state.json"/>
+            </div>
+          </div>
+          <div className="input-row">
+            <div className="input-group">
+              <div className="input-label">Backup Destination</div>
+              <input type="text" value={backupDir} onChange={e => setBackupDir(e.target.value)} placeholder="backup_folder"/>
+            </div>
+            <div className="input-group" style={{maxWidth:120}}>
+              <div className="input-label">Interval (mins)</div>
+              <input type="number" value={interval} onChange={e => setInterval_(e.target.value)} min={1} max={60}/>
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={start} disabled={loading} style={{marginTop:8}}>
+            ▶ Start Scheduler
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+
+function App() {
+  const [page, setPage]   = useState("dashboard");
+  const [online, setOnline] = useState(false);
+  const [toastMsg, setToastMsg] = useState(null);
+
+  useEffect(() => {
+    async function check() {
+      try {
+        const r = await fetch(`${API}/health`);
+        setOnline(r.ok);
+      } catch { setOnline(false); }
+    }
+    check();
+    const id = setInterval(check, 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  function toast(msg, type="success") {
+    setToastMsg({ msg, type });
+  }
+
+  const pages = { dashboard: <Dashboard toast={toast}/>, files: <Files toast={toast}/>, runs: <Runs/>, scheduler: <Scheduler toast={toast}/> };
+
+  return (
+    <div className="app">
+      <Sidebar page={page} setPage={setPage} online={online}/>
+      <div className="main">
+        {!online && (
+          <div style={{background:"rgba(255,77,109,0.1)", border:"1px solid rgba(255,77,109,0.2)", borderRadius:6, padding:"10px 16px", marginBottom:20, fontSize:12, color:"var(--danger)"}}>
+            ✗ Cannot reach metadata server at {API} — make sure it's running with: <code>python3 main.py server:start</code>
+          </div>
+        )}
+        {pages[page]}
+      </div>
+      {toastMsg && <Toast {...toastMsg} onClose={() => setToastMsg(null)}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

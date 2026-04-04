@@ -1,0 +1,66 @@
+{
+  "sample.txt": {
+    "path": "sample.txt",
+    "sha256": "73dafdf33c7ff8f218702f03785ea85de01205aa626d278201fc03a419494f9e",
+    "size": 92,
+    "chunks": [
+      {
+        "index": 0,
+        "sha256": "73dafdf33c7ff8f218702f03785ea85de01205aa626d278201fc03a419494f9e",
+        "size": 92,
+        "compressed": true,
+        "local_path": "chunks/73/73dafdf33c7ff8f218702f03785ea85de01205aa626d278201fc03a419494f9e",
+        "s3_key": null
+      }
+    ],
+    "backed_up_at": 1775273744.8544195
+  },
+  "test_change_detector.py": {
+    "path": "test_change_detector.py",
+    "sha256": "90dd37bc7bbcc4630b1768f6096d15da4167615d7828101934b4e98dfdc79b29",
+    "size": 5229,
+    "chunks": [
+      {
+        "index": 0,
+        "sha256": "90dd37bc7bbcc4630b1768f6096d15da4167615d7828101934b4e98dfdc79b29",
+        "size": 5229,
+        "compressed": true,
+        "local_path": "chunks/90/90dd37bc7bbcc4630b1768f6096d15da4167615d7828101934b4e98dfdc79b29",
+        "s3_key": null
+      }
+    ],
+    "backed_up_at": 1775241969.1375208
+  },
+  "THIS IS CHIRAG.txt": {
+    "path": "THIS IS CHIRAG.txt",
+    "sha256": "25a588ae5b9abb84a46a46cacaa65e07126dce44cdd2f8bee58fd56b1948e13c",
+    "size": 61,
+    "chunks": [
+      {
+        "index": 0,
+        "sha256": "25a588ae5b9abb84a46a46cacaa65e07126dce44cdd2f8bee58fd56b1948e13c",
+        "size": 61,
+        "compressed": true,
+        "local_path": "chunks/25/25a588ae5b9abb84a46a46cacaa65e07126dce44cdd2f8bee58fd56b1948e13c",
+        "s3_key": null
+      }
+    ],
+    "backed_up_at": 1775273754.9451067
+  },
+  "aditya.txt": {
+    "path": "aditya.txt",
+    "sha256": "15cee5540c20a78f1f24f718559dc29561b256a5bf025317ae0d078ed4e029e1",
+    "size": 23,
+    "chunks": [
+      {
+        "index": 0,
+        "sha256": "15cee5540c20a78f1f24f718559dc29561b256a5bf025317ae0d078ed4e029e1",
+        "size": 23,
+        "compressed": false,
+        "local_path": "chunks/15/15cee5540c20a78f1f24f718559dc29561b256a5bf025317ae0d078ed4e029e1",
+        "s3_key": null
+      }
+    ],
+    "backed_up_at": 1775274515.1869953
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "sample.txt": {
+    "path": "sample.txt",
+    "sha256": "73dafdf33c7ff8f218702f03785ea85de01205aa626d278201fc03a419494f9e",
+    "size": 92,
+    "mtime": 1775273744.3922656
+  },
+  "test_change_detector.py": {
+    "path": "test_change_detector.py",
+    "sha256": "90dd37bc7bbcc4630b1768f6096d15da4167615d7828101934b4e98dfdc79b29",
+    "size": 5229,
+    "mtime": 1775200630.0163655
+  },
+  "THIS IS CHIRAG.txt": {
+    "path": "THIS IS CHIRAG.txt",
+    "sha256": "25a588ae5b9abb84a46a46cacaa65e07126dce44cdd2f8bee58fd56b1948e13c",
+    "size": 61,
+    "mtime": 1775273752.0658672
+  },
+  "aditya.txt": {
+    "path": "aditya.txt",
+    "sha256": "15cee5540c20a78f1f24f718559dc29561b256a5bf025317ae0d078ed4e029e1",
+    "size": 23,
+    "mtime": 1775274510.8314998
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "files": {
+    "sample.txt": {
+      "path": "sample.txt",
+      "sha256": "73dafdf33c7ff8f218702f03785ea85de01205aa626d278201fc03a419494f9e",
+      "size": 92,
+      "mtime": 1775273744.3922656,
+      "backed_up_at": 1775273744.3922656,
+      "change_type": "unchanged",
+      "compressed": false,
+      "chunk_count": 1,
+      "run_id": "startup_sync_1775275438"
+    },
+    "test_change_detector.py": {
+      "path": "test_change_detector.py",
+      "sha256": "90dd37bc7bbcc4630b1768f6096d15da4167615d7828101934b4e98dfdc79b29",
+      "size": 5229,
+      "mtime": 1775200630.0163655,
+      "backed_up_at": 1775200630.0163655,
+      "change_type": "unchanged",
+      "compressed": false,
+      "chunk_count": 1,
+      "run_id": "startup_sync_1775275438"
+    },
+    "THIS IS CHIRAG.txt": {
+      "path": "THIS IS CHIRAG.txt",
+      "sha256": "25a588ae5b9abb84a46a46cacaa65e07126dce44cdd2f8bee58fd56b1948e13c",
+      "size": 61,
+      "mtime": 1775273752.0658672,
+      "backed_up_at": 1775273752.0658672,
+      "change_type": "unchanged",
+      "compressed": false,
+      "chunk_count": 1,
+      "run_id": "startup_sync_1775275438"
+    },
+    "aditya.txt": {
+      "path": "aditya.txt",
+      "sha256": "15cee5540c20a78f1f24f718559dc29561b256a5bf025317ae0d078ed4e029e1",
+      "size": 23,
+      "mtime": 1775274510.8314998,
+      "backed_up_at": 1775274510.8314998,
+      "change_type": "unchanged",
+      "compressed": false,
+      "chunk_count": 1,
+      "run_id": "startup_sync_1775275438"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "run_20260404_001609_8630fe",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775241969.1980906,
+      "file_count": 2,
+      "summary": {
+        "files_new": 2,
+        "files_modified": 0,
+        "files_deleted": 0,
+        "files_unchanged": 0,
+        "chunks_total": 2,
+        "chunks_skipped": 0,
+        "bytes_original": 5269,
+        "bytes_stored": 1301,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_001709_c098fd",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775242029.2466645,
+      "file_count": 2,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 1,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 64,
+        "bytes_stored": 64,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "force_sync",
+      "watch_root": "tests",
+      "timestamp": 1775273389.7833335,
+      "file_count": 3,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775273634",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273634.6401725,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775273634",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273634.674602,
+      "file_count": 3,
+      "summary": {}
+    },
+    {
+      "run_id": "run_20260404_090454_6798d4",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273694.7435145,
+      "file_count": 3,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 2,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 46,
+        "bytes_stored": 46,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_090524_5d2add",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273724.8419785,
+      "file_count": 3,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 2,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 76,
+        "bytes_stored": 76,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_090544_27c908",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273744.924217,
+      "file_count": 3,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 2,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 92,
+        "bytes_stored": 84,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_090554_3b8b5f",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273755.017212,
+      "file_count": 3,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 2,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 61,
+        "bytes_stored": 55,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_090825_f0aa5b",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775273905.0929978,
+      "file_count": 4,
+      "summary": {
+        "files_new": 1,
+        "files_modified": 0,
+        "files_deleted": 0,
+        "files_unchanged": 3,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 7,
+        "bytes_stored": 7,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "run_20260404_091835_58125f",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/project/tests",
+      "timestamp": 1775274515.255924,
+      "file_count": 4,
+      "summary": {
+        "files_new": 0,
+        "files_modified": 1,
+        "files_deleted": 0,
+        "files_unchanged": 3,
+        "chunks_total": 1,
+        "chunks_skipped": 0,
+        "bytes_original": 23,
+        "bytes_stored": 23,
+        "duration_s": 0.0
+      }
+    },
+    {
+      "run_id": "startup_sync_1775275438",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/Team_Dhurandar/tests",
+      "timestamp": 1775275438.8893173,
+      "file_count": 0,
+      "summary": {}
+    },
+    {
+      "run_id": "startup_sync_1775275438",
+      "watch_root": "/home/sumit-bushan-singh/Desktop/Team_Dhurandar/tests",
+      "timestamp": 1775275438.9291403,
+      "file_count": 4,
+      "summary": {}
+    }
+  ]
+}
