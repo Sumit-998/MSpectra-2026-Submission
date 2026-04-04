@@ -26,10 +26,6 @@ import threading
 import time
 from pathlib import Path
 
-import sys
-import os
-
-
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -112,6 +108,31 @@ def startup():
     print(f"  Database     : {DB_PATH.resolve()}")
     print(f"  Files tracked: {len(_db['files'])}")
     print(f"  Backup runs  : {len(_db['runs'])}\n")
+
+    # Auto-start scheduler if WATCH_ROOT env var is set (Railway deployment)
+    import os
+    watch_root = os.environ.get("WATCH_ROOT")
+    if watch_root:
+        try:
+            from backup.scheduler import BackupScheduler
+            global _scheduler, _scheduler_thread
+            _scheduler = BackupScheduler(
+                watch_root      = watch_root,
+                index_path      = os.environ.get("INDEX_PATH", ".backup/state.json"),
+                backup_dir      = os.environ.get("BACKUP_DIR", "backup_folder"),
+                metadata_server = f"http://localhost:{os.environ.get('PORT', 8000)}",
+                interval_mins   = int(os.environ.get("INTERVAL_MINS", 5)),
+                use_watcher     = True,
+            )
+            _scheduler_thread = threading.Thread(
+                target=_scheduler.start,
+                kwargs={"block": True},
+                daemon=True,
+            )
+            _scheduler_thread.start()
+            print(f"  Auto-started scheduler watching: {watch_root}")
+        except Exception as e:
+            print(f"  Scheduler auto-start skipped: {e}")
 
 
 # ── Health ────────────────────────────────────────────────────────────────────
@@ -256,20 +277,38 @@ def scheduler_status():
     return s
 
 
-# ── Frontend ──────────────────────────────────────────────────────────────────
+# ── AI Prioritization endpoint ────────────────────────────────────────────────
+
+class PrioritizePayload(BaseModel):
+    api_key: str
 
 
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
+@app.post("/ai/prioritize")
+def ai_prioritize(payload: PrioritizePayload):
+    """
+    Uses Groq LLM to rank all backed-up files by priority.
+    Returns files sorted from highest to lowest priority.
+    """
+    files = list(_db["files"].values())
+    if not files:
+        return {"files": [], "message": "No files to prioritize"}
+
+    try:
+        from server.groq_prioritizer import prioritize_files_with_groq
+        ranked = prioritize_files_with_groq(files, payload.api_key)
+        return {"files": ranked, "total": len(ranked)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 def frontend():
-    path = Path(__file__).parent.parent / "frontend" / "index.html"
-    if path.exists():
-        return FileResponse(path)
-    return {"error": "UI file missing"}
+    """Serve the React frontend."""
+    frontend_path = Path("frontend/index.html")
+    if frontend_path.exists():
+        return FileResponse(frontend_path)
+    return {"message": "Frontend not found. Place frontend/index.html in your project root."}
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
